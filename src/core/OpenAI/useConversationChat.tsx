@@ -55,6 +55,7 @@ export function useConversationChat({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [template]);
 
+	// as userInput gets retrieved, update the template variables.
 	const _templateVariables = useMemo(
 		() => ({
 			input: userInput,

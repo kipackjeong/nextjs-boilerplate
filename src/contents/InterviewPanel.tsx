@@ -4,7 +4,7 @@ import { VFlex } from '@/core/Flex/VFlex';
 import { Icon, IconButton, Input, Select, Text } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
 import CompanyRadioSelection from '@/lib/components/CompanyRadioSelection';
-import { useConversationChat } from '@/app/dev/live-interview/useConversationChat';
+import { useConversationChat } from '@/core/OpenAI/useConversationChat';
 import { RecognitionStatus, useSpeechAI } from '../core/SpeechAI/useSpeechAI';
 import { FaMicrophone } from 'react-icons/fa';
 
@@ -73,6 +73,7 @@ export function InterviewPanel(props: IInterviewPanelProps) {
 	// triggers when user submits the input
 	useEffect(() => {
 		if (submitted) {
+			console.log('useEffect if submitted');
 			setUserInput('');
 			setConversations((prev) => [...prev, userInput]);
 			setSubmitted(false);

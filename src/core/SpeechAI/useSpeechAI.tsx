@@ -94,7 +94,6 @@ export function useSpeechAI({
 		if (!recognizer) {
 			return;
 		}
-
 		onSpeechResult(recognizedSpeechText);
 		setRecognizedSpeechText('');
 
@@ -109,7 +108,7 @@ export function useSpeechAI({
 				);
 			}
 		);
-	}, [recognizer, onSpeechResult, recognizedSpeechText]);
+	}, [onSpeechResult, recognizedSpeechText, recognizer]);
 
 	async function startMicWithContinuousRecognition() {
 		if (!recognizer) {

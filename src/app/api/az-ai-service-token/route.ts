@@ -12,10 +12,9 @@ export async function GET(request: Request, response: Response) {
 			},
 		});
 	} else {
-		console.log('cookie does not exists in server');
-
 		const speechKey = process.env.azureSpeechAIKey;
-		const speechRegion = 'westus';
+		const speechRegion = process.env.azureSpeechRegion;
+
 		const headers = {
 			headers: {
 				'Ocp-Apim-Subscription-Key': speechKey,
