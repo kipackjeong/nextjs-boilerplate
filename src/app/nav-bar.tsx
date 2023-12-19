@@ -16,7 +16,7 @@ import {
 	Stack,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
-import { HFlex } from '@/core/Flex/HFlex';
+import { HFlex } from '@/core/components/flexes/HFlex';
 import link from 'next/link';
 
 const Links = ['Projects', 'Dev'];
