@@ -19,7 +19,7 @@ const SideBar = () => {
 	const { isOnline } = useAppStatus();
 
 	const linkItems: Array<any> = [
-		{ name: 'Home', icon: FiHome, link: '/home' },
+		{ name: 'Home', icon: FiHome, link: '/' },
 		isOnline
 			? { name: 'Logout', icon: FaUser, link: '/logout' }
 			: { name: 'Login', icon: FaUser, link: '/login' },

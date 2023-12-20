@@ -204,7 +204,7 @@ function Login() {
 				<Link
 					color="teal.500"
 					onClick={useLocalClickHandler}
-					href={'/home'}
+					href={'/'}
 				>
 					Use local
 				</Link>

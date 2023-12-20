@@ -28,7 +28,7 @@ const Auth = ({ children }: PropsWithChildren) => {
 
 				// browser has user auth token.
 				dispatch(userActions.setUser(user));
-				router.push('/home');
+				router.push('/');
 			} catch (error) {
 				// browser don't have user auth token or is expired.
 				console.log('No Authorization token cookie on the browser');

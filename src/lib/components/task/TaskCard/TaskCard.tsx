@@ -1,234 +1,255 @@
 import {
-  Text,
-  Card,
-  CardBody,
-  Flex,
-  Tag,
-  TagLabel,
-  Spinner,
-  CardProps,
-} from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { Scrollbars } from "react-custom-scrollbars";
-import { useAppStatus } from "../../../hooks/useAppStatus";
-import TaskDescription from "../TaskDescription/TaskDescription";
-import taskLocalService from "../../../services/task/task.local-service";
-import taskService from "@lib/services/task/task.service";
-import { getDateStr, getDMMMYYYY } from "@core/utils/helper";
+	Text,
+	Card,
+	CardBody,
+	Flex,
+	Tag,
+	TagLabel,
+	Spinner,
+	CardProps,
+} from '@chakra-ui/react';
+import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import {
+	Scrollbars,
+	positionValues,
+	positionValues,
+} from 'react-custom-scrollbars';
+import { useAppStatus } from '../../../hooks/useAppStatus';
+import TaskDescription from '../TaskDescription/TaskDescription';
+import taskLocalService from '../../../services/task/task.local-service';
+import taskService from '@lib/services/task/task.service';
+import { getDateStr, getDMMMYYYY } from '@core/utils/helper';
 
 type TaskCardProps = {} & CardProps;
 
 const TaskCard = ({ task, ...rest }) => {
-  const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
-  const [madeChanges, setMadeChanges] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [changedPriority, setChangedPriority] = useState(task.priority);
+	const [madeChanges, setMadeChanges] = useState(false);
+	const [isUpdating, setIsUpdating] = useState(false);
+	const [changedPriority, setChangedPriority] = useState(task.priority);
 
-  const { isOnline } = useAppStatus();
+	const { isOnline } = useAppStatus();
 
-  // Sets the starting poisition of the scroll.
-  useEffect(() => {
-    setIsUpdating(true);
-    setChangedPriority(task.priority);
+	// Sets the starting poisition of the scroll.
+	useEffect(() => {
+		setIsUpdating(true);
+		setChangedPriority(task.priority);
 
-    let thisPriorityTabPosition;
+		let thisPriorityTabPosition;
 
-    switch (task.priority) {
-      case 3: // Low
-        thisPriorityTabPosition = 200;
-        break;
-      case 2: // Med
-        thisPriorityTabPosition = 99;
-        break;
-      case 1: // High
-        thisPriorityTabPosition = 0;
-        break;
-    }
-    // this is the actual div element of Scrollbars component
-    const elements: HTMLCollectionOf<Element> = document.getElementsByClassName(
-      "task-priority-scrollbar-" + task._id
-    );
+		switch (task.priority) {
+			case 3: // Low
+				thisPriorityTabPosition = 200;
+				break;
+			case 2: // Med
+				thisPriorityTabPosition = 99;
+				break;
+			case 1: // High
+				thisPriorityTabPosition = 0;
+				break;
+		}
+		// this is the actual div element of Scrollbars component
+		const elements: HTMLCollectionOf<Element> =
+			document.getElementsByClassName(
+				'task-priority-scrollbar-' + task._id
+			);
 
-    // get it's child
+		// get it's child
 
-    let element: Element;
-    let child;
-    for (var i = 0; i < elements.length; i++) {
-      element = elements[i];
-      console.log(element);
-      child = element.firstChild;
-      child.scrollTo({ top: thisPriorityTabPosition, behavior: "smooth" });
-    }
+		let element: Element;
+		let child;
+		for (var i = 0; i < elements.length; i++) {
+			element = elements[i];
+			console.log(element);
+			child = element.firstChild;
+			const childElement = element as HTMLElement;
+			childElement.scrollTo({
+				top: thisPriorityTabPosition,
+				behavior: 'smooth',
+			});
+		}
 
-    setIsUpdating(false);
-  }, [task.priority]);
+		setIsUpdating(false);
+	}, [task.priority]);
 
-  /**
-   * Place where actual local state (changedPriority) set happens
-   */
-  function scrollBarsScrollFrameHandler(value) {
-    const scrollTop = value.scrollTop;
-    switch (scrollTop) {
-      case 0:
-        if (changedPriority != 1) {
-          setChangedPriority(1);
-          setMadeChanges(true);
-        }
+	/**
+	 * Place where actual local state (changedPriority) set happens
+	 */
+	function scrollBarsScrollFrameHandler(value: positionValues) {
+		const scrollTop = value.scrollTop;
+		switch (scrollTop) {
+			case 0:
+				if (changedPriority != 1) {
+					setChangedPriority(1);
+					setMadeChanges(true);
+				}
 
-        break;
-      case 100:
-        if (changedPriority != 2) {
-          setChangedPriority(2);
-          setMadeChanges(true);
-        }
-        break;
-      case 199:
-        if (changedPriority != 3) {
-          setChangedPriority(3);
-          setMadeChanges(true);
-        }
-        break;
-    }
-  }
-  /**
-   * Where api call happens to update changes.
-   */
-  async function cardMouseLeaveHandler() {
-    // check for update status
-    if (madeChanges) {
-      // there is update to do
+				break;
+			case 100:
+				if (changedPriority != 2) {
+					setChangedPriority(2);
+					setMadeChanges(true);
+				}
+				break;
+			case 199:
+				if (changedPriority != 3) {
+					setChangedPriority(3);
+					setMadeChanges(true);
+				}
+				break;
+		}
+	}
+	/**
+	 * Where api call happens to update changes.
+	 */
+	async function cardMouseLeaveHandler() {
+		// check for update status
+		if (madeChanges) {
+			// there is update to do
 
-      // call api to update changes
-      const payload = { ...task, priority: changedPriority };
+			// call api to update changes
+			const payload = { ...task, priority: changedPriority };
 
-      isOnline
-        ? await taskService.update(payload, dispatch)
-        : await taskLocalService.update(payload, dispatch);
+			isOnline
+				? await taskService.update(payload, dispatch)
+				: await taskLocalService.update(payload, dispatch);
 
-      setMadeChanges(false);
-    }
-  }
+			setMadeChanges(false);
+		}
+	}
 
-  const colors = {
-    1: { dark: "brand.red.150", med: "brand.red.50", light: "white" },
-    2: {
-      dark: "brand.yellow.150",
-      med: "brand.yellow.50",
-      light: "white",
-    },
-    3: {
-      dark: "brand.green.150",
-      med: "brand.green.50",
-      light: "white",
-    },
-  };
+	const colors = {
+		1: { dark: 'brand.red.150', med: 'brand.red.50', light: 'white' },
+		2: {
+			dark: 'brand.yellow.150',
+			med: 'brand.yellow.50',
+			light: 'white',
+		},
+		3: {
+			dark: 'brand.green.150',
+			med: 'brand.green.50',
+			light: 'white',
+		},
+	};
 
-  const options = [
-    { label: "High", value: 1 },
-    { label: "Med", value: 2 },
-    { label: "Low", value: 3 },
-  ];
+	const options = [
+		{ label: 'High', value: 1 },
+		{ label: 'Med', value: 2 },
+		{ label: 'Low', value: 3 },
+	];
 
-  const [timer, setTimer] = useState(null);
-  const [showTaskDescription, setShowTaskDescription] = useState(false);
+	const [timer, setTimer] = useState<NodeJS.Timeout | undefined>(undefined);
+	const [showTaskDescription, setShowTaskDescription] = useState(false);
 
-  const onClickHandler = () => {
-    setShowTaskDescription(true);
-  };
+	const onClickHandler = () => {
+		setShowTaskDescription(true);
+	};
 
-  const onTouchStartHandler = () => {
-    setTimer(setTimeout(() => setShowTaskDescription(true), 1000));
-  };
+	const onTouchStartHandler = () => {
+		setTimer(setTimeout(() => setShowTaskDescription(true), 1000));
+	};
 
-  const onTouchEndHandler = () => {
-    setShowTaskDescription(false);
-    clearTimeout(timer);
-  };
+	const onTouchEndHandler = () => {
+		setShowTaskDescription(false);
+		clearTimeout(timer);
+	};
 
-  return isUpdating ? (
-    <Spinner />
-  ) : (
-    <>
-      {showTaskDescription && (
-        <TaskDescription task={task} setShow={setShowTaskDescription} />
-      )}
-      <Card
-        className={"TaskCard"}
-        cursor="pointer"
-        onClick={onClickHandler}
-        onTouchStart={onTouchStartHandler}
-        onTouchEnd={onTouchEndHandler}
-        onMouseLeave={cardMouseLeaveHandler}
-        {...rest}
-      >
-        <CardBody
-          className={"TaskCard" + "__body"}
-          p={2}
-          borderWidth={1}
-          backgroundColor={colors[task.priority].light}
-          borderColor={colors[task.priority].dark}
-          _hover={{
-            backgroundColor: colors[task.priority].med,
-          }}
-          display="flex"
-          flexDir={"row"}
-          columnGap={5}
-        >
-          <Scrollbars
-            className={"task-priority-scrollbar-" + task._id}
-            style={{
-              width: "3em",
-              height: "1.5em",
-              overflowX: "hidden",
-              overflowY: "hidden",
-            }}
-            thumbSize={1}
-            autoHide={true}
-            onScrollFrame={scrollBarsScrollFrameHandler}
-          >
-            <Flex
-              className={"task-priority-tag-" + task._id}
-              flexDir={"column"}
-              justifyContent="stretch"
-              height={"8em"}
-              w="100%"
-              cursor="pointer"
-              rowGap={"59%"}
-            >
-              {options.map((o) => {
-                return (
-                  <Tag
-                    h="100%"
-                    id={o.label}
-                    key={o.label}
-                    backgroundColor={colors[o.value].dark}
-                    onMouseOver={(e) => {
-                      setChangedPriority(o.value);
-                    }}
-                  >
-                    <TagLabel>{o.label}</TagLabel>
-                  </Tag>
-                );
-              })}
-            </Flex>
-          </Scrollbars>
-          <Text className={"TaskCard" + "__body" + "__date"} fontSize={"sm"}>
-            {getDMMMYYYY(task.timeInterval.startTime)}
-          </Text>
-          <Text
-            flex={1}
-            textAlign="center"
-            className={"TaskCard" + "__body" + "__detail"}
-            fontSize={"sm"}
-          >
-            {task.detail}
-          </Text>
-        </CardBody>
-      </Card>
-    </>
-  );
+	return isUpdating ? (
+		<Spinner />
+	) : (
+		<>
+			{showTaskDescription && (
+				<TaskDescription task={task} setShow={setShowTaskDescription} />
+			)}
+			<Card
+				className={'TaskCard'}
+				cursor="pointer"
+				onClick={onClickHandler}
+				onTouchStart={onTouchStartHandler}
+				onTouchEnd={onTouchEndHandler}
+				onMouseLeave={cardMouseLeaveHandler}
+				{...rest}
+			>
+				<CardBody
+					className={'TaskCard' + '__body'}
+					p={2}
+					borderWidth={1}
+					backgroundColor={
+						colors[task.priority as keyof typeof colors].light
+					}
+					borderColor={
+						colors[task.priority as keyof typeof colors].dark
+					}
+					_hover={{
+						backgroundColor:
+							colors[task.priority as keyof typeof colors].med,
+					}}
+					display="flex"
+					flexDir={'row'}
+					columnGap={5}
+				>
+					<Scrollbars
+						className={'task-priority-scrollbar-' + task._id}
+						style={{
+							width: '3em',
+							height: '1.5em',
+							overflowX: 'hidden',
+							overflowY: 'hidden',
+						}}
+						thumbSize={1}
+						autoHide={true}
+						onScrollFrame={scrollBarsScrollFrameHandler}
+					>
+						<Flex
+							className={'task-priority-tag-' + task._id}
+							flexDir={'column'}
+							justifyContent="stretch"
+							height={'8em'}
+							w="100%"
+							cursor="pointer"
+							rowGap={'59%'}
+						>
+							{options.map((o) => {
+								return (
+									<Tag
+										h="100%"
+										id={o.label}
+										key={o.label}
+										backgroundColor={
+											colors[
+												o.value as keyof typeof colors
+											].dark
+										}
+										onMouseOver={(e) => {
+											setChangedPriority(o.value);
+										}}
+									>
+										<TagLabel>{o.label}</TagLabel>
+									</Tag>
+								);
+							})}
+						</Flex>
+					</Scrollbars>
+					<Text
+						className={'TaskCard' + '__body' + '__date'}
+						fontSize={'sm'}
+					>
+						{getDMMMYYYY(task.timeInterval.startTime)}
+					</Text>
+					<Text
+						flex={1}
+						textAlign="center"
+						className={'TaskCard' + '__body' + '__detail'}
+						fontSize={'sm'}
+					>
+						{task.detail}
+					</Text>
+				</CardBody>
+			</Card>
+		</>
+	);
 };
 
 export default TaskCard;

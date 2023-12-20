@@ -49,7 +49,7 @@ const TaskForm = ({
 	console.log('TaskForm - render');
 	// #region Hooks
 	const titleRef = useRef<HTMLInputElement>();
-	const descriptionRef = useRef<HTMLInputElement>();
+	const reflectionRef = useRef<HTMLInputElement>();
 	const [priority, setPriority] = useState<number>(2);
 	const focusLevelRef = useRef<FocusLevelRef>('');
 	const [taskType, setTaskType] = useState(task.taskType);
@@ -95,7 +95,7 @@ const TaskForm = ({
 		const createPayload: ITask = {
 			...task,
 			detail: titleRef.current?.value,
-			reflection: descriptionRef.current?.value,
+			reflection: reflectionRef.current?.value,
 			focusLevel: Number(focusLevelRef.current?.value),
 			timeInterval,
 			taskType: taskType,
@@ -103,15 +103,20 @@ const TaskForm = ({
 			priority: Number(priority),
 		};
 
-		isUpdateForm
-			? isOnline
+		if (isUpdateForm) {
+			console.log('createPayload: ', createPayload);
+			isOnline
 				? await taskService.update(createPayload, dispatch)
-				: await taskLocalService.update(createPayload, dispatch)
-			: isOnline
-			? await taskService.create(createPayload, dispatch)
-			: await taskLocalService.create(createPayload, dispatch);
+				: await taskLocalService.update(createPayload, dispatch);
+		} else {
+			console.log('createPayload: ', createPayload);
 
-		onSubmit();
+			isOnline
+				? await taskService.create(createPayload, dispatch)
+				: await taskLocalService.create(createPayload, dispatch);
+		}
+
+		onSubmit(e);
 	}
 
 	function onClose() {
@@ -187,7 +192,7 @@ const TaskForm = ({
 				<Input
 					ref={titleRef as LegacyRef<HTMLInputElement>}
 					width="100%"
-					placeholder=" "
+					placeholder=""
 					defaultValue={task.detail}
 				/>
 				<FormLabel>Title</FormLabel>
@@ -200,12 +205,12 @@ const TaskForm = ({
 				isInvalid={false}
 			>
 				<Input
-					ref={titleRef as LegacyRef<HTMLInputElement>}
+					ref={reflectionRef as LegacyRef<HTMLInputElement>}
 					width="100%"
 					placeholder=" "
 					defaultValue={task.reflection}
 				/>
-				<FormLabel>Description </FormLabel>
+				<FormLabel>Reflection </FormLabel>
 			</FormControl>
 		</>
 	);

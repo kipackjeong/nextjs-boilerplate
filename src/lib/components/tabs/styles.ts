@@ -1,3 +1,4 @@
-export const tabStyle = {
-  w: "95%",
+export const tabGlobalStyle = {
+	w: '95%',
+	p: 2,
 };
